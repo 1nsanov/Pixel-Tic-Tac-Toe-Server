@@ -1,0 +1,31 @@
+{
+  "name": "socketio-server",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "dev": "nodemon",
+    "build": "tsc",
+    "start": "node dist/server.js"
+  },
+  "dependencies": {
+    "cookie-parser": "~1.4.4",
+    "cors": "^2.8.5",
+    "debug": "~2.6.9",
+    "express": "~4.16.1",
+    "glob": "^7.1.7",
+    "http-errors": "~1.6.3",
+    "jade": "~1.11.0",
+    "mongoose": "^6.3.8",
+    "morgan": "~1.9.1",
+    "reflect-metadata": "^0.1.13",
+    "socket-controllers": "^0.0.5",
+    "socket.io": "^4.1.2"
+  },
+  "devDependencies": {
+    "@types/node": "^16.11.38",
+    "nodemon": "^2.0.16",
+    "ts-node": "^10.0.0",
+    "typescript": "^4.3.5"
+  }
+}
