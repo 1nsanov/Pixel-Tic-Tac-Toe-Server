@@ -14,8 +14,7 @@ import { ConnectDB } from "./api/controllers/MongoDB/ConnectDB";
 
 
 // Connect to MongoDB
-const connectDB = new ConnectDB();
-connectDB.conectionDB();
+ConnectDB.conectionDB();
 
 /**
  * Get port from environment and store in Express.
