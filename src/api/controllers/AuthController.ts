@@ -13,7 +13,7 @@ export class AuthController {
     let authUserResponse = message.authUser as IAuthUser;
     console.log("Registering user... ", authUserResponse);
 
-    let userExists = await AuthUserSchema.findOne({ name: authUserResponse.Nickname });
+    let userExists = await AuthUserSchema.findOne({ Nickname: authUserResponse.Nickname });
     if (userExists) {
       socket.emit("user_register_error", { error: "User already exists" });
     }
@@ -50,12 +50,12 @@ export class AuthController {
     if(userExists){
       if (userExists.Password === authUserResponse.Password) {
         console.log("User logged in: ", authUserResponse);
-        socket.emit("user_login_success", { user: authUserResponse });
+        socket.emit("user_login_success", { user: userExists });
       }
       else{
         socket.emit("user_login_error", { error: "Password is incorrect." });
       }
-      socket.emit("user_login_success", { user: authUserResponse });
+      socket.emit("user_login_success", { user: userExists });
     }
     else{
       console.log("User not found: ", authUserResponse);
