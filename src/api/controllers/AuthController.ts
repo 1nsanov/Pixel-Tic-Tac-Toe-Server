@@ -46,7 +46,7 @@ export class AuthController {
   @OnMessage("user_login")
   public async userLogin(@ConnectedSocket() socket: Socket, @MessageBody() message: any) {
     let authUserResponse = message.authUser as IUserLogin;
-    let userExists = await AuthUserSchema.findOne({ name: authUserResponse.Nickname });
+    let userExists = await AuthUserSchema.findOne({ Nickname: authUserResponse.Nickname });
     if(userExists){
       if (userExists.Password === authUserResponse.Password) {
         console.log("User logged in: ", authUserResponse);
