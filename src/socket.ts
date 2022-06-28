@@ -4,6 +4,7 @@ import { RoomController } from "./api/controllers/roomController";
 import { GameController } from "./api/controllers/GameController";
 import { AuthController } from "./api/controllers/AuthController";
 import { LeaderboardController } from "./api/controllers/LeaderboardController";
+import { ChatController } from "./api/controllers/ChatController";
 import { Server } from "socket.io"
 
 export default (httpServer) => {
@@ -12,6 +13,6 @@ export default (httpServer) => {
       origin: "*",
     }
   })
-  useSocketServer(io, { controllers: [MainController, RoomController, GameController, AuthController, LeaderboardController] });
+  useSocketServer(io, { controllers: [MainController, RoomController, GameController, AuthController, LeaderboardController, ChatController] });
   return io;
 }
