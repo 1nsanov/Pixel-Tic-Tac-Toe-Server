@@ -11,8 +11,7 @@ const http = require("http");
 const socket_1 = require("./socket");
 const ConnectDB_1 = require("./api/controllers/MongoDB/ConnectDB");
 // Connect to MongoDB
-const connectDB = new ConnectDB_1.ConnectDB();
-connectDB.conectionDB();
+ConnectDB_1.ConnectDB.conectionDB();
 /**
  * Get port from environment and store in Express.
  */

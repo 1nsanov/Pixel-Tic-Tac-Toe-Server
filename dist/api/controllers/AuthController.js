@@ -15,42 +15,56 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
 const socket_controllers_1 = require("socket-controllers");
 const socket_io_1 = require("socket.io");
-const UserSchema = require("./MongoDB/Schemas/UserSchema");
+const AuthUserSchema = require("./MongoDB/Schemas/AuthUserSchema");
 let AuthController = class AuthController {
     async userRegister(socket, message) {
-        let userResponse = message.newUser;
-        let userExists = await UserSchema.findOne({ name: userResponse.name });
-        console.log("Registering user: ", userResponse);
+        let authUserResponse = message.authUser;
+        console.log("Registering user... ", authUserResponse);
+        let userExists = await AuthUserSchema.findOne({ Nickname: authUserResponse.Nickname });
         if (userExists) {
             socket.emit("user_register_error", { error: "User already exists" });
         }
-        else if (userResponse.name.length < 4 && userResponse.password.length < 4) {
+        else if (authUserResponse.Nickname.length < 4 && authUserResponse.Password.length < 6) {
             socket.emit("user_register_error", {
-                error: "ERROR: Name and password must be at least 3 characters long"
+                error: "Nickname must be at least 4 characters\nPassword must be at least 6 characters\n"
             });
         }
         else {
             console.log("User name and password is valid");
-            const user = new UserSchema({
-                name: userResponse.name,
-                password: userResponse.password
+            const AuthUser = new AuthUserSchema({
+                UserId: authUserResponse.UserId,
+                Nickname: authUserResponse.Nickname,
+                Password: authUserResponse.Password,
+                AvatarId: authUserResponse.AvatarId,
+                CountFinishedGames: authUserResponse.CountFinishedGames,
+                CountWins: authUserResponse.CountWins,
+                CountLosses: authUserResponse.CountLosses,
+                Score: authUserResponse.Score,
+                StatusOnline: authUserResponse.StatusOnline,
+                DataRegister: authUserResponse.DataRegister
             });
-            console.log(user);
-            user.save().then(() => {
+            console.log("Add user to DB: ", AuthUser);
+            AuthUser.save().then(() => {
                 socket.emit("user_register_success");
             });
         }
     }
     async userLogin(socket, message) {
-        let userResponse = message.user;
-        let userExists = await UserSchema.findOne({ name: userResponse.name, password: userResponse.password });
+        let authUserResponse = message.authUser;
+        let userExists = await AuthUserSchema.findOne({ Nickname: authUserResponse.Nickname });
         if (userExists) {
-            console.log("User logged in: ", userResponse);
-            socket.emit("user_login_success", { user: userResponse });
+            if (userExists.Password === authUserResponse.Password) {
+                console.log("User logged in: ", authUserResponse);
+                socket.emit("user_login_success", { user: userExists });
+            }
+            else {
+                socket.emit("user_login_error", { error: "Password is incorrect." });
+            }
+            socket.emit("user_login_success", { user: userExists });
         }
         else {
-            console.log("User not found: ", userResponse);
-            socket.emit("user_login_error", { error: "User not found" });
+            console.log("User not found: ", authUserResponse);
+            socket.emit("user_login_error", { error: "There is no user with this nickname." });
         }
     }
 };

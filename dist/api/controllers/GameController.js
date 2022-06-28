@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.GameController = void 0;
 const socket_controllers_1 = require("socket-controllers");
 const socket_io_1 = require("socket.io");
+const AuthUserSchema = require("./MongoDB/Schemas/AuthUserSchema");
 let GameController = class GameController {
     getSocketGameRoom(socket) {
         const socketRooms = Array.from(socket.rooms.values()).filter(room => room !== socket.id);
@@ -28,6 +29,22 @@ let GameController = class GameController {
     async gameWin(io, socket, message) {
         const gameRoom = this.getSocketGameRoom(socket);
         socket.to(gameRoom).emit("on_game_win", message);
+        await AuthUserSchema.updateOne();
+    }
+    async setResultGame(io, socket, message) {
+        console.log(message);
+        let resultGame = message;
+        let user = await AuthUserSchema.findOne({ UserId: resultGame.UserId });
+        user.CountFinishedGames = user.CountFinishedGames + 1;
+        if (resultGame.IsWin) {
+            user.CountWins = user.CountWins + 1;
+            user.Score = user.Score + 10;
+        }
+        else {
+            user.CountLosses = user.CountLosses + 1;
+            user.Score = user.Score - 10;
+        }
+        await user.save();
     }
 };
 __decorate([
@@ -48,6 +65,15 @@ __decorate([
     __metadata("design:paramtypes", [socket_io_1.Server, socket_io_1.Socket, Object]),
     __metadata("design:returntype", Promise)
 ], GameController.prototype, "gameWin", null);
+__decorate([
+    (0, socket_controllers_1.OnMessage)("set_result_game"),
+    __param(0, (0, socket_controllers_1.SocketIO)()),
+    __param(1, (0, socket_controllers_1.ConnectedSocket)()),
+    __param(2, (0, socket_controllers_1.MessageBody)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [socket_io_1.Server, socket_io_1.Socket, Object]),
+    __metadata("design:returntype", Promise)
+], GameController.prototype, "setResultGame", null);
 GameController = __decorate([
     (0, socket_controllers_1.SocketController)()
 ], GameController);

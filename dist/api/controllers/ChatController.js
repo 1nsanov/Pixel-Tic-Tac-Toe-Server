@@ -12,40 +12,30 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RoomController = void 0;
+exports.ChatController = void 0;
 const socket_controllers_1 = require("socket-controllers");
 const socket_io_1 = require("socket.io");
-let RoomController = class RoomController {
-    async joinGame(io, socket, message) {
-        console.log("New user joined the room", message);
-        const connectedSockets = io.sockets.adapter.rooms.get(message.roomId);
+let ChatController = class ChatController {
+    getSocketGameRoom(socket) {
         const socketRooms = Array.from(socket.rooms.values()).filter(room => room !== socket.id);
-        console.log(connectedSockets);
-        if (socketRooms.length > 0 && connectedSockets && connectedSockets.size === 2) {
-            socket.emit("room_join_error", {
-                error: "Room is full"
-            });
-        }
-        else {
-            await socket.join(message.roomId);
-            socket.emit("room_joined");
-            if (io.sockets.adapter.rooms.get(message.roomId).size === 2) {
-                socket.emit("start_game", { start: true, symbol: 'o' });
-                socket.to(message.roomId).emit("start_game", { start: false, symbol: 'x' });
-            }
-        }
+        const gameRoom = socketRooms && socketRooms[0];
+        return gameRoom;
+    }
+    async sendMessage(socket, message) {
+        console.log("Recieve message:", message);
+        const gameRoom = this.getSocketGameRoom(socket);
+        socket.to(gameRoom).emit("on_send_message", message);
     }
 };
 __decorate([
-    (0, socket_controllers_1.OnMessage)("join_game"),
-    __param(0, (0, socket_controllers_1.SocketIO)()),
-    __param(1, (0, socket_controllers_1.ConnectedSocket)()),
-    __param(2, (0, socket_controllers_1.MessageBody)()),
+    (0, socket_controllers_1.OnMessage)("send_message"),
+    __param(0, (0, socket_controllers_1.ConnectedSocket)()),
+    __param(1, (0, socket_controllers_1.MessageBody)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [socket_io_1.Server, socket_io_1.Socket, Object]),
+    __metadata("design:paramtypes", [socket_io_1.Socket, Object]),
     __metadata("design:returntype", Promise)
-], RoomController.prototype, "joinGame", null);
-RoomController = __decorate([
+], ChatController.prototype, "sendMessage", null);
+ChatController = __decorate([
     (0, socket_controllers_1.SocketController)()
-], RoomController);
-exports.RoomController = RoomController;
+], ChatController);
+exports.ChatController = ChatController;

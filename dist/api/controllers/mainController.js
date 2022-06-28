@@ -15,12 +15,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MainController = void 0;
 const socket_controllers_1 = require("socket-controllers");
 const socket_io_1 = require("socket.io");
+const ConnectDB_1 = require("./MongoDB/ConnectDB");
 let MainController = class MainController {
     onConnection(socket, io) {
-        console.log("New Socket Connection ", socket.id);
+        console.log("New Socket Connection", socket.id);
+    }
+    async checkStatusDB(socket) {
+        if (ConnectDB_1.ConnectDB.IsConnectDB) {
+            socket.emit("check_status_db_success", { statusDB: true });
+        }
+        else {
+            socket.emit("check_status_db_error", { statusDB: false });
+        }
     }
     onDisconnect(socket) {
-        console.log('client disconnected ', socket.id);
+        console.log('Client disconnected', socket.id);
     }
 };
 __decorate([
@@ -31,6 +40,13 @@ __decorate([
     __metadata("design:paramtypes", [socket_io_1.Socket, socket_io_1.Server]),
     __metadata("design:returntype", void 0)
 ], MainController.prototype, "onConnection", null);
+__decorate([
+    (0, socket_controllers_1.OnMessage)("check_status_db"),
+    __param(0, (0, socket_controllers_1.ConnectedSocket)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [socket_io_1.Socket]),
+    __metadata("design:returntype", Promise)
+], MainController.prototype, "checkStatusDB", null);
 __decorate([
     (0, socket_controllers_1.OnDisconnect)(),
     __param(0, (0, socket_controllers_1.ConnectedSocket)()),
