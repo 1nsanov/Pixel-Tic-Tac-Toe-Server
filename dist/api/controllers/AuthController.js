@@ -45,7 +45,7 @@ let AuthController = class AuthController {
             });
             console.log("Add user to DB: ", AuthUser);
             AuthUser.save().then(() => {
-                socket.emit("user_register_success");
+                socket.emit("user_register_success", authUserResponse);
             });
         }
     }
@@ -55,12 +55,11 @@ let AuthController = class AuthController {
         if (userExists) {
             if (userExists.Password === authUserResponse.Password) {
                 console.log("User logged in: ", authUserResponse);
-                socket.emit("user_login_success", { user: userExists });
+                socket.emit("user_login_success", userExists);
             }
             else {
                 socket.emit("user_login_error", { error: "Password is incorrect." });
             }
-            socket.emit("user_login_success", { user: userExists });
         }
         else {
             console.log("User not found: ", authUserResponse);
